@@ -1,24 +1,26 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { User } from './models/user.model';
 import { BaseUserDto } from './dto/base-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { UserDto } from './dto/user.dto';
-const ObjectID = Types.ObjectId;
+import { EmailValidationService } from '../shared/email-validation/email-validation.service';
 
 @Injectable()
 export class UsersService {
     private saltRounds = 10;
 
-    constructor(@InjectModel('user') private readonly userModel: Model<User>) {
+    constructor(@InjectModel('user') private readonly userModel: Model<User>,
+                private emailValidationService: EmailValidationService) {
     }
 
     public async registerUser(userDto: BaseUserDto): Promise<HttpStatus > {
         try {
             userDto.passwordHash = await this.getHash(userDto.password);
             delete userDto.password;
-            await new this.userModel(userDto).save();
+            const user = await new this.userModel(userDto).save();
+            await this.emailValidationService.sendValidationRequest(user);
 
             return HttpStatus.OK;
         } catch ({ code, name }) {

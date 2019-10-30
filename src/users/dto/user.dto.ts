@@ -2,11 +2,11 @@ import { BaseUserDto } from './base-user.dto';
 import { Exclude, Transform } from 'class-transformer';
 
 export class UserDto extends BaseUserDto {
-    userRole: string;
+    public userRole: string;
 
     @Transform((value) => {
         return value.toString();
-    }, { toPlainOnly: true });
+    }, { toPlainOnly: true })
     public _id: string;
 
     @Exclude()

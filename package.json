@@ -30,6 +30,7 @@
     "class-transformer": "^0.2.3",
     "es6-shim": "^0.35.5",
     "mongoose": "^5.7.4",
+    "nodemailer": "^6.3.1",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
