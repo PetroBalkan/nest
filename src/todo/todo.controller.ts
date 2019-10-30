@@ -10,7 +10,7 @@ export class TodoController {
   }
 
   @Post()
-  async create(@Body() todoDto: TodoDto) {
+  public async create(@Body() todoDto: TodoDto) {
     return this.todoService.create(todoDto);
   }
 
