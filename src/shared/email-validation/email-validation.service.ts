@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserDto } from '../../users/dto/user.dto';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { VerificationUserModel } from '../../users/models/verification-user.model';
 import { VerificationTokenDto } from '../../users/dto/verification-token.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class EmailValidationService {
@@ -13,7 +14,11 @@ export class EmailValidationService {
     }
 
     public async sendValidationRequest(user: UserDto): Promise<any> {
-        const token: VerificationTokenDto = {_userId: user._id, token: '111', createdAt: new Date().toISOString()};
+        const token: VerificationTokenDto = {
+            userId: user._id,
+            token: this.generateValidationToken(),
+            createdAt: new Date().toISOString(),
+        };
         const content = `<h1>${token.token}</h1>`;
 
         try {
@@ -21,11 +26,19 @@ export class EmailValidationService {
             this.verificationUserModel(token).save();
 
         } catch (e) {
-            throw e;
+            throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
         }
     }
 
+    public async verifyUserEmail(userId: string, verificationCode: string): Promise<HttpStatus> {
+        const verificationToken: VerificationTokenDto = await this.verificationUserModel.findOne((error, token) => token.userId === userId);
+        if (verificationToken && verificationToken.token === verificationCode) {
+            return HttpStatus.OK;
+        }
+        throw new HttpException('Invalid verification', HttpStatus.BAD_REQUEST);
+    }
+
     private generateValidationToken(): string {
-        return;
+        return crypto.randomBytes(24).toString('hex');
     }
 }

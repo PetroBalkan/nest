@@ -6,9 +6,13 @@ import { UserSchema } from './schemas/user.schema';
 import { MailSenderService } from '../shared/mail-sender/mail-sender.service';
 import { VerificationTokenSchema } from './schemas/verification-token.schema';
 import { EmailValidationService } from '../shared/email-validation/email-validation.service';
+import { ConfigModule } from '../config/config.module';
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: 'user', schema: UserSchema }, { name: 'verificationUser', schema: VerificationTokenSchema }])],
+    imports: [
+        MongooseModule.forFeature([{ name: 'user', schema: UserSchema }, { name: 'verificationUser', schema: VerificationTokenSchema }]),
+        ConfigModule,
+    ],
     providers: [UsersService, EmailValidationService, MailSenderService],
     exports: [UsersService],
     controllers: [UserController],

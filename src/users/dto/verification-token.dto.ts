@@ -1,5 +1,5 @@
 export class VerificationTokenDto {
-    _userId: string;
+    userId: string;
     token: string;
     createdAt: string;
 }

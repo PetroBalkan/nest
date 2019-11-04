@@ -15,7 +15,7 @@ export class UsersService {
                 private emailValidationService: EmailValidationService) {
     }
 
-    public async registerUser(userDto: BaseUserDto): Promise<HttpStatus > {
+    public async registerUser(userDto: BaseUserDto): Promise<HttpStatus> {
         try {
             userDto.passwordHash = await this.getHash(userDto.password);
             delete userDto.password;
@@ -35,7 +35,6 @@ export class UsersService {
         try {
             return await this.userModel.find(user => user.email === email);
         } catch (e) {
-
         }
     }
 
@@ -45,7 +44,16 @@ export class UsersService {
             const user = await this.userModel.findById(id).lean().exec();
             return new UserDto(user);
         } catch (e) {
-            console.log(e);
+        }
+    }
+
+    public async verifyUserEmail(userId: string, verificationCode: string): Promise<any> {
+        try {
+            await this.emailValidationService.verifyUserEmail(userId, verificationCode);
+            await this.userModel.findByIdAndUpdate(userId, {isVerified: true});
+            return 'Congratulation! You successfully confirmed Your email!';
+        } catch (error) {
+            return error;
         }
     }
 

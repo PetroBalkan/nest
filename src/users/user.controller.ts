@@ -22,4 +22,12 @@ export class UserController {
     public async getById(@Param('id') id: string): Promise<UserDto> {
         return this.usersService.findById(id);
     }
+
+    @Get(':userId/:verificationCode')
+    public verifyEmail(
+        @Param('userId') userId: string,
+        @Param('verificationCode') verificationCode: string,
+    ): Promise<HttpStatus> {
+        return this.usersService.verifyUserEmail(userId, verificationCode);
+    }
 }
